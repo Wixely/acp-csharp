@@ -131,6 +131,66 @@ public sealed class AgentSideConnection : IDisposable, IAcpClient
             };
         });
 
+        endpoint.SetRequestHandler(AgentMethods.SessionList, async (request, ct) =>
+        {
+            AcpException.ThrowIfParamIsNull(request.Params);
+
+            var response = await agent.ListSessionsAsync(JsonSerializer.Deserialize(
+                request.Params!.Value,
+                AcpJsonSerializerContext.Default.Options.GetTypeInfo<ListSessionsRequest>())!, ct);
+
+            return new JsonRpcResponse
+            {
+                Id = request.Id,
+                Result = JsonSerializer.SerializeToElement(response, AcpJsonSerializerContext.Default.Options.GetTypeInfo<ListSessionsResponse>())
+            };
+        });
+
+        endpoint.SetRequestHandler(AgentMethods.SessionFork, async (request, ct) =>
+        {
+            AcpException.ThrowIfParamIsNull(request.Params);
+
+            var response = await agent.ForkSessionAsync(JsonSerializer.Deserialize(
+                request.Params!.Value,
+                AcpJsonSerializerContext.Default.Options.GetTypeInfo<ForkSessionRequest>())!, ct);
+
+            return new JsonRpcResponse
+            {
+                Id = request.Id,
+                Result = JsonSerializer.SerializeToElement(response, AcpJsonSerializerContext.Default.Options.GetTypeInfo<ForkSessionResponse>())
+            };
+        });
+
+        endpoint.SetRequestHandler(AgentMethods.SessionResume, async (request, ct) =>
+        {
+            AcpException.ThrowIfParamIsNull(request.Params);
+
+            var response = await agent.ResumeSessionAsync(JsonSerializer.Deserialize(
+                request.Params!.Value,
+                AcpJsonSerializerContext.Default.Options.GetTypeInfo<ResumeSessionRequest>())!, ct);
+
+            return new JsonRpcResponse
+            {
+                Id = request.Id,
+                Result = JsonSerializer.SerializeToElement(response, AcpJsonSerializerContext.Default.Options.GetTypeInfo<ResumeSessionResponse>())
+            };
+        });
+
+        endpoint.SetRequestHandler(AgentMethods.SessionClose, async (request, ct) =>
+        {
+            AcpException.ThrowIfParamIsNull(request.Params);
+
+            var response = await agent.CloseSessionAsync(JsonSerializer.Deserialize(
+                request.Params!.Value,
+                AcpJsonSerializerContext.Default.Options.GetTypeInfo<CloseSessionRequest>())!, ct);
+
+            return new JsonRpcResponse
+            {
+                Id = request.Id,
+                Result = JsonSerializer.SerializeToElement(response, AcpJsonSerializerContext.Default.Options.GetTypeInfo<CloseSessionResponse>())
+            };
+        });
+
         endpoint.SetNotificationHandler(AgentMethods.SessionCancel, async (notification, ct) =>
         {
             AcpException.ThrowIfParamIsNull(notification.Params);

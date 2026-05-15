@@ -247,6 +247,26 @@ public sealed class ClientSideConnection : IDisposable, IAcpAgent
         return RequestAsync<SetSessionModelRequest, SetSessionModelResponse>(AgentMethods.SessionSetModel, request, cancellationToken);
     }
 
+    public ValueTask<ListSessionsResponse> ListSessionsAsync(ListSessionsRequest request, CancellationToken cancellationToken = default)
+    {
+        return RequestAsync<ListSessionsRequest, ListSessionsResponse>(AgentMethods.SessionList, request, cancellationToken);
+    }
+
+    public ValueTask<ForkSessionResponse> ForkSessionAsync(ForkSessionRequest request, CancellationToken cancellationToken = default)
+    {
+        return RequestAsync<ForkSessionRequest, ForkSessionResponse>(AgentMethods.SessionFork, request, cancellationToken);
+    }
+
+    public ValueTask<ResumeSessionResponse> ResumeSessionAsync(ResumeSessionRequest request, CancellationToken cancellationToken = default)
+    {
+        return RequestAsync<ResumeSessionRequest, ResumeSessionResponse>(AgentMethods.SessionResume, request, cancellationToken);
+    }
+
+    public ValueTask<CloseSessionResponse> CloseSessionAsync(CloseSessionRequest request, CancellationToken cancellationToken = default)
+    {
+        return RequestAsync<CloseSessionRequest, CloseSessionResponse>(AgentMethods.SessionClose, request, cancellationToken);
+    }
+
     public async ValueTask<JsonElement> ExtMethodAsync(string method, JsonElement request, CancellationToken cancellationToken = default)
     {
         var response = await endpoint.SendRequestAsync(new JsonRpcRequest

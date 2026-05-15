@@ -100,4 +100,13 @@ namespace AgentClientProtocol;
 [JsonSerializable(typeof(PlanSessionUpdate))]
 [JsonSerializable(typeof(AvailableCommandsUpdateSessionUpdate))]
 [JsonSerializable(typeof(CurrentModeUpdateSessionUpdate))]
+[JsonSerializable(typeof(SessionInfo))]
+[JsonSerializable(typeof(ListSessionsRequest))]
+[JsonSerializable(typeof(ListSessionsResponse))]
+[JsonSerializable(typeof(ForkSessionRequest))]
+[JsonSerializable(typeof(ForkSessionResponse))]
+[JsonSerializable(typeof(ResumeSessionRequest))]
+[JsonSerializable(typeof(ResumeSessionResponse))]
+[JsonSerializable(typeof(CloseSessionRequest))]
+[JsonSerializable(typeof(CloseSessionResponse))]
 public partial class AcpJsonSerializerContext : JsonSerializerContext;
