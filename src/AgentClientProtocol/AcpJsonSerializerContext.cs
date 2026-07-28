@@ -2,7 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace AgentClientProtocol;
 
-[JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault)]
+// WhenWritingNull, not WhenWritingDefault: the latter also drops non-nullable value types at
+// their default — e.g. StopReason.EndTurn (0) serialized PromptResponse as {}, omitting the
+// spec-required stopReason field (likewise ToolCallStatus.Pending / ToolKind.Read).
+[JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 [JsonSerializable(typeof(RequestId))]
 [JsonSerializable(typeof(JsonRpcMessage))]
 [JsonSerializable(typeof(JsonRpcRequest))]
