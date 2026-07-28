@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/sandbox/">
-    <Project Path="sandbox/ConsoleApp1/ConsoleApp1.csproj" />
+    <Project Path="sandbox/ExampleClient/ExampleClient.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/AgentClientProtocol/AgentClientProtocol.csproj" />

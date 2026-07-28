@@ -19,13 +19,15 @@ try
 {
     if (!process.Start())
     {
-        throw new Exception("Failed to start agent proccess");
+        throw new Exception("Failed to start agent process");
     }
 
     var client = new ExampleClient();
     var connection = new ClientSideConnection(_ => client, process.StandardOutput, process.StandardInput);
 
-    connection.Open();
+    // Open() returns the background read-loop Task; the sample runs it fire-and-forget
+    // and drives the connection through the request methods below.
+    _ = connection.Open();
 
     var initResult = await connection.InitializeAsync(new InitializeRequest
     {

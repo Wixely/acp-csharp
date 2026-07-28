@@ -5,7 +5,14 @@
     <LangVersion>13.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <IsAotCompitable>true</IsAotCompitable>
+    <!-- Not asserting IsAotCompatible: the polymorphic JsonConverters (ContentBlock,
+         SessionUpdate, ToolCallContent, McpServer, RequestPermissionOutcome,
+         EmbeddedResourceResource) fall back to reflection-based JsonSerializer calls
+         (IL2026/IL3050), so enabling the AOT analyzer produces genuine warnings. The
+         original project set this via a misspelled property ("IsAotCompitable") that
+         never took effect. Route those converters through the source-gen
+         AcpJsonSerializerContext to make AOT support real, then flip this to true. -->
+    <IsAotCompatible>false</IsAotCompatible>
 
     <!-- NuGet Packaging -->
     <PackageId>AgentClientProtocol</PackageId>
