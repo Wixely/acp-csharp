@@ -1,12 +1,17 @@
 <Project>
 
     <PropertyGroup>
-        <!-- NuGet Packaging -->
-        <PackageVersion>0.1.5</PackageVersion>
+        <!-- NuGet Packaging.
+             Base version is the local/dev fallback; CI overrides it from the pushed tag.
+             Original author credit is preserved (nuskey / Yusuke Nakada); the project and
+             repository URLs point at this fork because that is where these packages are
+             built and hosted (GitHub Packages requires RepositoryUrl to match the publisher).
+             See the README "About this fork" section for what diverges from upstream. -->
+        <PackageVersion>0.2.0</PackageVersion>
         <Authors>nuskey</Authors>
         <Copyright>© Yusuke Nakada</Copyright>
-        <PackageProjectUrl>https://github.com/nuskey8/acp-csharp</PackageProjectUrl>
-        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/Wixely/acp-csharp</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Wixely/acp-csharp</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

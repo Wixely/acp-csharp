@@ -1,0 +1,70 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      # A pushed v* tag drives the package version; other builds use the base version
+      # from Directory.Build.props.
+      - name: Resolve version from tag
+        id: ver
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            echo "value=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+            echo "Packing version ${GITHUB_REF#refs/tags/v} from tag."
+          else
+            echo "value=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Restore
+        run: dotnet restore src/AgentClientProtocol/AgentClientProtocol.csproj
+
+      - name: Build
+        run: >
+          dotnet build src/AgentClientProtocol/AgentClientProtocol.csproj
+          -c Release --no-restore
+          ${{ steps.ver.outputs.value && format('-p:Version={0}', steps.ver.outputs.value) || '' }}
+
+      - name: Pack
+        run: >
+          dotnet pack src/AgentClientProtocol/AgentClientProtocol.csproj
+          -c Release --no-build -o artifacts
+          ${{ steps.ver.outputs.value && format('-p:PackageVersion={0}', steps.ver.outputs.value) || '' }}
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*.nupkg
+
+      # Publish to this repo's GitHub Packages feed on a version tag. Uses the built-in
+      # GITHUB_TOKEN — no extra secrets needed. --skip-duplicate makes re-runs idempotent.
+      - name: Publish to GitHub Packages
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: >
+          dotnet nuget push "artifacts/*.nupkg"
+          --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          --api-key "${{ secrets.GITHUB_TOKEN }}"
+          --skip-duplicate
