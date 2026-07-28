@@ -131,6 +131,21 @@ public sealed class AgentSideConnection : IDisposable, IAcpClient
             };
         });
 
+        endpoint.SetRequestHandler(AgentMethods.SessionSetConfigOption, async (request, ct) =>
+        {
+            AcpException.ThrowIfParamIsNull(request.Params);
+
+            var response = await agent.SetConfigOptionAsync(JsonSerializer.Deserialize(
+                request.Params!.Value,
+                AcpJsonSerializerContext.Default.Options.GetTypeInfo<SetSessionConfigOptionRequest>())!, ct);
+
+            return new JsonRpcResponse
+            {
+                Id = request.Id,
+                Result = JsonSerializer.SerializeToElement(response, AcpJsonSerializerContext.Default.Options.GetTypeInfo<SetSessionConfigOptionResponse>())
+            };
+        });
+
         endpoint.SetRequestHandler(AgentMethods.SessionList, async (request, ct) =>
         {
             // Every session/list param is optional, so omitted params are valid.

@@ -13,4 +13,7 @@ public record ResumeSessionResponse
 
     [JsonPropertyName("modes")]
     public SessionModeState? Modes { get; init; }
+
+    [JsonPropertyName("configOptions")]
+    public SessionConfigOption[]? ConfigOptions { get; init; }
 }

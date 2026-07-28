@@ -35,6 +35,7 @@ public class SessionUpdateJsonConverter : JsonConverter<SessionUpdate>
             "current_mode_update" => root.Deserialize<CurrentModeUpdateSessionUpdate>(options),
             "session_info_update" => root.Deserialize<SessionInfoUpdateSessionUpdate>(options),
             "usage_update" => root.Deserialize<UsageUpdateSessionUpdate>(options),
+            "config_option_update" => root.Deserialize<ConfigOptionUpdateSessionUpdate>(options),
             // The spec's extensibility rules require tolerating update kinds we don't
             // model yet (e.g. config_option_update) instead of failing the stream.
             _ => new UnknownSessionUpdate { Kind = type ?? "", Raw = root.Clone() }
@@ -191,6 +192,16 @@ public record UsageUpdateSessionUpdate : SessionUpdate
 
     [JsonPropertyName("cost")]
     public Cost? Cost { get; init; }
+}
+
+public record ConfigOptionUpdateSessionUpdate : SessionUpdate
+{
+    [JsonPropertyName("sessionUpdate")]
+    public override string Update => "config_option_update";
+
+    /// <summary>The full, updated set of config options.</summary>
+    [JsonPropertyName("configOptions")]
+    public required SessionConfigOption[] ConfigOptions { get; init; }
 }
 
 public record Cost

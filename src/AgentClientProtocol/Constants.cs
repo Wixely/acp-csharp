@@ -10,6 +10,7 @@ public static class AgentMethods
     public const string SessionPrompt = "session/prompt";
     public const string SessionSetMode = "session/set_mode";
     public const string SessionSetModel = "session/set_model";
+    public const string SessionSetConfigOption = "session/set_config_option";
     public const string SessionList = "session/list";
     public const string SessionFork = "session/fork";
     public const string SessionResume = "session/resume";

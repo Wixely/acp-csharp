@@ -247,6 +247,11 @@ public sealed class ClientSideConnection : IDisposable, IAcpAgent
         return RequestAsync<SetSessionModelRequest, SetSessionModelResponse>(AgentMethods.SessionSetModel, request, cancellationToken);
     }
 
+    public ValueTask<SetSessionConfigOptionResponse> SetConfigOptionAsync(SetSessionConfigOptionRequest request, CancellationToken cancellationToken = default)
+    {
+        return RequestAsync<SetSessionConfigOptionRequest, SetSessionConfigOptionResponse>(AgentMethods.SessionSetConfigOption, request, cancellationToken);
+    }
+
     public ValueTask<ListSessionsResponse> ListSessionsAsync(ListSessionsRequest request, CancellationToken cancellationToken = default)
     {
         return RequestAsync<ListSessionsRequest, ListSessionsResponse>(AgentMethods.SessionList, request, cancellationToken);
