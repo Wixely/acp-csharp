@@ -14,6 +14,7 @@ public static class AgentMethods
     public const string SessionFork = "session/fork";
     public const string SessionResume = "session/resume";
     public const string SessionClose = "session/close";
+    public const string SessionDelete = "session/delete";
 }
 
 public static class ClientMethods

@@ -267,6 +267,11 @@ public sealed class ClientSideConnection : IDisposable, IAcpAgent
         return RequestAsync<CloseSessionRequest, CloseSessionResponse>(AgentMethods.SessionClose, request, cancellationToken);
     }
 
+    public ValueTask<DeleteSessionResponse> DeleteSessionAsync(DeleteSessionRequest request, CancellationToken cancellationToken = default)
+    {
+        return RequestAsync<DeleteSessionRequest, DeleteSessionResponse>(AgentMethods.SessionDelete, request, cancellationToken);
+    }
+
     public async ValueTask<JsonElement> ExtMethodAsync(string method, JsonElement request, CancellationToken cancellationToken = default)
     {
         var response = await endpoint.SendRequestAsync(new JsonRpcRequest
@@ -286,8 +291,11 @@ public sealed class ClientSideConnection : IDisposable, IAcpAgent
 
     public ValueTask ExtNotificationAsync(string method, JsonElement notification, CancellationToken cancellationToken = default)
     {
-        // writer.WriteLineAsync(notification.ToString());
-        return default;
+        return endpoint.SendMessageAsync(new JsonRpcNotification
+        {
+            Method = method,
+            Params = notification
+        }, cancellationToken);
     }
 
     public void Dispose()

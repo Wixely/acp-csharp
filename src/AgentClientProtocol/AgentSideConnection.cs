@@ -191,6 +191,21 @@ public sealed class AgentSideConnection : IDisposable, IAcpClient
             };
         });
 
+        endpoint.SetRequestHandler(AgentMethods.SessionDelete, async (request, ct) =>
+        {
+            AcpException.ThrowIfParamIsNull(request.Params);
+
+            var response = await agent.DeleteSessionAsync(JsonSerializer.Deserialize(
+                request.Params!.Value,
+                AcpJsonSerializerContext.Default.Options.GetTypeInfo<DeleteSessionRequest>())!, ct);
+
+            return new JsonRpcResponse
+            {
+                Id = request.Id,
+                Result = JsonSerializer.SerializeToElement(response, AcpJsonSerializerContext.Default.Options.GetTypeInfo<DeleteSessionResponse>())
+            };
+        });
+
         endpoint.SetNotificationHandler(AgentMethods.SessionCancel, async (notification, ct) =>
         {
             AcpException.ThrowIfParamIsNull(notification.Params);

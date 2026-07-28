@@ -109,4 +109,7 @@ namespace AgentClientProtocol;
 [JsonSerializable(typeof(ResumeSessionResponse))]
 [JsonSerializable(typeof(CloseSessionRequest))]
 [JsonSerializable(typeof(CloseSessionResponse))]
+[JsonSerializable(typeof(DeleteSessionRequest))]
+[JsonSerializable(typeof(DeleteSessionResponse))]
+[JsonSerializable(typeof(SessionCapabilities))]
 public partial class AcpJsonSerializerContext : JsonSerializerContext;

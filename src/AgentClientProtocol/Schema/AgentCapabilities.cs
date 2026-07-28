@@ -16,6 +16,9 @@ public record AgentCapabilities
 
     [JsonPropertyName("promptCapabilities")]
     public PromptCapabilities PromptCapabilities { get; init; } = new();
+
+    [JsonPropertyName("sessionCapabilities")]
+    public SessionCapabilities? SessionCapabilities { get; init; }
 }
 
 public record McpCapabilities
