@@ -11,6 +11,9 @@ public record NewSessionRequest
     [JsonPropertyName("mcpServers")]
     public required McpServer[] McpServers { get; init; }
 
+    [JsonPropertyName("additionalDirectories")]
+    public string[]? AdditionalDirectories { get; init; }
+
     [JsonPropertyName("_meta")]
     public JsonElement? Meta { get; init; }
 }

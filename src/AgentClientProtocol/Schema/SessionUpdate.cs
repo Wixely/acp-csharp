@@ -33,12 +33,21 @@ public class SessionUpdateJsonConverter : JsonConverter<SessionUpdate>
             "plan" => root.Deserialize<PlanSessionUpdate>(options),
             "available_commands_update" => root.Deserialize<AvailableCommandsUpdateSessionUpdate>(options),
             "current_mode_update" => root.Deserialize<CurrentModeUpdateSessionUpdate>(options),
-            _ => throw new JsonException($"Unknown SessionUpdate type: {type}")
+            "session_info_update" => root.Deserialize<SessionInfoUpdateSessionUpdate>(options),
+            "usage_update" => root.Deserialize<UsageUpdateSessionUpdate>(options),
+            // The spec's extensibility rules require tolerating update kinds we don't
+            // model yet (e.g. config_option_update) instead of failing the stream.
+            _ => new UnknownSessionUpdate { Kind = type ?? "", Raw = root.Clone() }
         };
     }
 
     public override void Write(Utf8JsonWriter writer, SessionUpdate value, JsonSerializerOptions options)
     {
+        if (value is UnknownSessionUpdate unknown)
+        {
+            unknown.Raw.WriteTo(writer);
+            return;
+        }
         JsonSerializer.Serialize(writer, value, value.GetType(), options);
     }
 }
@@ -155,4 +164,59 @@ public record CurrentModeUpdateSessionUpdate : SessionUpdate
 
     [JsonPropertyName("currentModeId")]
     public required string CurrentModeId { get; init; }
+}
+
+public record SessionInfoUpdateSessionUpdate : SessionUpdate
+{
+    [JsonPropertyName("sessionUpdate")]
+    public override string Update => "session_info_update";
+
+    [JsonPropertyName("title")]
+    public string? Title { get; init; }
+
+    [JsonPropertyName("updatedAt")]
+    public string? UpdatedAt { get; init; }
+}
+
+public record UsageUpdateSessionUpdate : SessionUpdate
+{
+    [JsonPropertyName("sessionUpdate")]
+    public override string Update => "usage_update";
+
+    [JsonPropertyName("used")]
+    public required long Used { get; init; }
+
+    [JsonPropertyName("size")]
+    public required long Size { get; init; }
+
+    [JsonPropertyName("cost")]
+    public Cost? Cost { get; init; }
+}
+
+public record Cost
+{
+    [JsonPropertyName("_meta")]
+    public JsonElement? Meta { get; init; }
+
+    [JsonPropertyName("amount")]
+    public required double Amount { get; init; }
+
+    [JsonPropertyName("currency")]
+    public required string Currency { get; init; }
+}
+
+/// <summary>
+/// A session update whose kind this SDK doesn't model. Carries the raw JSON so it
+/// round-trips losslessly; inspect <see cref="Raw"/> to consume it.
+/// </summary>
+public record UnknownSessionUpdate : SessionUpdate
+{
+    [JsonIgnore]
+    public override string Update => Kind;
+
+    [JsonIgnore]
+    public required string Kind { get; init; }
+
+    [JsonIgnore]
+    public required JsonElement Raw { get; init; }
 }

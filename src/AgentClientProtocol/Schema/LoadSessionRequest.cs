@@ -14,6 +14,9 @@ public record LoadSessionRequest
     [JsonPropertyName("cwd")]
     public required string Cwd { get; init; }
 
+    [JsonPropertyName("additionalDirectories")]
+    public string[]? AdditionalDirectories { get; init; }
+
     [JsonPropertyName("sessionId")]
     public required string SessionId { get; init; }
 }
