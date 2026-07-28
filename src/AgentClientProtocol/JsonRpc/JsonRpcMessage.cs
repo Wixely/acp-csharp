@@ -79,7 +79,7 @@ public sealed class JsonRpcMessageJsonConverter : JsonConverter<JsonRpcMessage>
 
         if (versionProperty.GetString() != "2.0")
         {
-            throw new JsonException("Invalidg jsonrpc version");
+            throw new JsonException("Invalid jsonrpc version");
         }
 
         var hasId = root.TryGetProperty("id", out _);

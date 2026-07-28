@@ -44,6 +44,27 @@ internal sealed class JsonRpcEndpoint(Func<CancellationToken, ValueTask<string?>
 
     public async Task ReadMessagesAsync(CancellationToken cancellationToken = default)
     {
+        try
+        {
+            await ReadMessagesCoreAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            // No more responses can ever arrive — fail outstanding requests instead of
+            // leaving their callers awaiting forever (e.g. an agent blocked on
+            // session/request_permission after the client process died).
+            foreach (var id in pendingRequests.Keys)
+            {
+                if (pendingRequests.TryRemove(id, out var tcs))
+                {
+                    tcs.TrySetException(new AcpException("Connection closed before a response was received", null, (int)JsonRpcErrorCode.InternalError));
+                }
+            }
+        }
+    }
+
+    async Task ReadMessagesCoreAsync(CancellationToken cancellationToken)
+    {
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -219,11 +240,18 @@ internal sealed class JsonRpcEndpoint(Func<CancellationToken, ValueTask<string?>
 
         var json = JsonSerializer.Serialize(request, AcpJsonSerializerContext.Default.Options.GetTypeInfo<JsonRpcRequest>());
 
-        var tcs = new TaskCompletionSource<JsonRpcResponse>();
+        var tcs = new TaskCompletionSource<JsonRpcResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
         pendingRequests.TryAdd(request.Id, tcs);
 
-        await WriteAsync(json, cancellationToken).ConfigureAwait(false);
-
-        return await tcs.Task;
+        try
+        {
+            using var cancelRegistration = cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken));
+            await WriteAsync(json, cancellationToken).ConfigureAwait(false);
+            return await tcs.Task.ConfigureAwait(false);
+        }
+        finally
+        {
+            pendingRequests.TryRemove(request.Id, out _);
+        }
     }
 }
