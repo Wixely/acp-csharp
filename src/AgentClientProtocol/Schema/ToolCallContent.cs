@@ -4,16 +4,26 @@ using System.Text.Json.Serialization;
 namespace AgentClientProtocol;
 
 [JsonConverter(typeof(ToolCallContentJsonConverter))]
-public abstract record ToolCallContent;
+public abstract record ToolCallContent
+{
+    [JsonPropertyName("type")]
+    public abstract string Type { get; }
+}
 
 public record ContentToolCallContent : ToolCallContent
 {
+    [JsonPropertyName("type")]
+    public override string Type => "content";
+
     [JsonPropertyName("content")]
     public required ContentBlock Content { get; init; }
 }
 
 public record DiffToolCallContent : ToolCallContent
 {
+    [JsonPropertyName("type")]
+    public override string Type => "diff";
+
     [JsonPropertyName("path")]
     public required string Path { get; init; }
 
@@ -26,6 +36,9 @@ public record DiffToolCallContent : ToolCallContent
 
 public record TerminalToolCallContent : ToolCallContent
 {
+    [JsonPropertyName("type")]
+    public override string Type => "terminal";
+
     [JsonPropertyName("terminalId")]
     public required string TerminalId { get; init; }
 }
@@ -42,6 +55,18 @@ public class ToolCallContentJsonConverter : JsonConverter<ToolCallContent>
             throw new JsonException("ToolCallContent must be a JSON object");
         }
 
+        if (root.TryGetProperty("type", out var typeProperty))
+        {
+            return typeProperty.GetString() switch
+            {
+                "content" => root.Deserialize<ContentToolCallContent>(options),
+                "diff" => root.Deserialize<DiffToolCallContent>(options),
+                "terminal" => root.Deserialize<TerminalToolCallContent>(options),
+                var t => throw new JsonException($"Unknown ToolCallContent type: {t}")
+            };
+        }
+
+        // Lenient fallback for peers that omit the discriminator: infer from the payload shape.
         if (root.TryGetProperty("content", out _))
         {
             return root.Deserialize<ContentToolCallContent>(options);
