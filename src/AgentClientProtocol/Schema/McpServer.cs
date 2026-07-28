@@ -59,9 +59,11 @@ public class McpServerJsonConverter : JsonConverter<McpServer>
         using var doc = JsonDocument.ParseValue(ref reader);
         var root = doc.RootElement;
 
+        // Per the spec only http/sse are tagged; the stdio variant is the untagged
+        // {name, command, args, env} object, so a missing 'type' means stdio.
         if (!root.TryGetProperty("type", out var typeProperty))
         {
-            throw new JsonException("Missing 'type' property in McpServer");
+            return root.Deserialize<StdioMcpServer>(options);
         }
 
         var type = typeProperty.GetString();

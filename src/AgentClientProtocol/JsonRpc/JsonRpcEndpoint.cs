@@ -76,7 +76,12 @@ internal sealed class JsonRpcEndpoint(Func<CancellationToken, ValueTask<string?>
                         }
                         break;
                     case JsonRpcNotification notification:
-                        _ = Task.Run(() => HandleNotificationAsync(notification, cancellationToken).AsTask(), cancellationToken);
+                        // Notifications are handled inline: session/update chunks must be
+                        // delivered in the order they arrived, which Task.Run would not
+                        // guarantee. This still cannot starve anything — the long-running
+                        // work (requests) runs off-loop, so a session/cancel notification
+                        // is processed while the prompt request it targets is in flight.
+                        await HandleNotificationAsync(notification, cancellationToken);
                         break;
                     default:
                         throw new AcpException($"Invalid response type: {message?.GetType().Name}", null, (int)JsonRpcErrorCode.InternalError);
