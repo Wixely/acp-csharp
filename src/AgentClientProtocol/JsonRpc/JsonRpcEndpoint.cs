@@ -48,6 +48,7 @@ internal sealed class JsonRpcEndpoint(Func<CancellationToken, ValueTask<string?>
             try
             {
                 var line = await readFunc(cancellationToken).ConfigureAwait(false);
+                if (line is null) return; // EOF — the peer closed the stream
                 if (string.IsNullOrWhiteSpace(line)) continue;
 
                 var trimmedLineSpan = line.AsSpan().Trim();

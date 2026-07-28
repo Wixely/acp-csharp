@@ -276,8 +276,8 @@ public sealed class ClientSideConnection : IDisposable, IAcpAgent
         cts.Dispose();
     }
 
-    public void Open()
+    public Task Open()
     {
-        Task.Run(async () => await endpoint.ReadMessagesAsync(cts.Token));
+        return Task.Run(async () => await endpoint.ReadMessagesAsync(cts.Token));
     }
 }
