@@ -109,7 +109,7 @@ public sealed class ClientSideConnection : IDisposable, IAcpAgent
             return new JsonRpcResponse
             {
                 Id = request.Id,
-                Result = JsonSerializer.SerializeToElement(response, AcpJsonSerializerContext.Default.Options.GetTypeInfo<TerminalOutputRequest>())
+                Result = JsonSerializer.SerializeToElement(response, AcpJsonSerializerContext.Default.Options.GetTypeInfo<TerminalOutputResponse>())
             };
         });
 
